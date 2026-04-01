@@ -4,5 +4,13 @@
   "workspaces": [
     "apps/*"
   ],
-  "packageManager": "yarn@4.13.0"
+  "packageManager": "yarn@4.13.0",
+  "scripts": {
+    "dev": "yarn workspaces foreach --all --parallel --interlaced run dev",
+    "build": "yarn workspaces foreach --all --topological run build",
+    "dev:host": "yarn workspace @rr-framework/host dev",
+    "dev:remote": "yarn workspace @rr-framework/remote dev",
+    "build:host": "yarn workspace @rr-framework/host build",
+    "build:remote": "yarn workspace @rr-framework/remote build"
+  }
 }
