@@ -19,12 +19,29 @@ A proof-of-concept monorepo demonstrating TanStack Start (SSR) working with `@mo
 ```bash
 nvm use
 yarn install
+```
 
-# Terminal 1 — start remote
-cd apps/remote && yarn dev
+### Run both apps
 
-# Terminal 2 — start host
-cd apps/host && yarn dev
+```bash
+yarn dev
+```
+
+This starts both the remote (port 5001) and host (port 3000) in parallel.
+
+### Run individually
+
+```bash
+yarn dev:remote   # remote only
+yarn dev:host     # host only
+```
+
+### Build
+
+```bash
+yarn build        # builds remote first, then host (topological order)
+yarn build:remote
+yarn build:host
 ```
 
 ## Status
