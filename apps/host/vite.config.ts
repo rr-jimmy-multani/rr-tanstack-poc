@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { federation } from '@module-federation/vite'
+import { nitro } from 'nitro/vite'
 export default defineConfig({
   plugins: [
     federation({
@@ -20,6 +21,7 @@ export default defineConfig({
     }),
     tanstackStart(),
     react(),
+    nitro(),
   ],
   ssr: {
     optimizeDeps: {

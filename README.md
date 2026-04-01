@@ -44,17 +44,41 @@ yarn build:remote
 yarn build:host
 ```
 
+### Sync local fork patches (after making changes in tanstack-router fork)
+
+```bash
+yarn sync-patches
+```
+
 ## Status
 
 | Scenario | Status |
 |---|---|
 | Dev server (SSR) | ✅ Working |
-| Production build | ⚠️ Requires a pending fix in TanStack Router ([#7032](https://github.com/TanStack/router/issues/7032)) |
+| Production build (client + SSR bundles) | ✅ Working |
+| Production server | ❌ Blocked — Nitro SSR entry detection conflict (see below) |
+
+## Known Issues
+
+### Layer 1: TanStack manifest scanner — fixed (PR open)
+
+`@tanstack/start-plugin-core`'s `scanClientChunks` throws when it encounters multiple `isEntry` chunks — `@module-federation/vite` injects `hostInit` and `remoteEntry` as entry chunks alongside the real app entry. Fix: skip entries whose `facadeModuleId` matches `__mf__virtual` or `virtual:mf-`.
+
+- **Issue:** [TanStack/router#7032](https://github.com/TanStack/router/issues/7032)
+- **PR:** [TanStack/router#7089](https://github.com/TanStack/router/pull/7089)
+
+### Layer 2: Nitro SSR entry detection — under investigation
+
+After fixing Layer 1, the production server (`node .output/server/index.mjs`) starts but crashes on the first request with `TypeError: mod.fetch is not a function`. Nitro detects the SSR entry by reading `environments.ssr.build.rollupOptions.input` — because `@module-federation/vite` injects `hostInit` into the SSR Rollup environment, Nitro picks it up as the SSR handler instead of the real TanStack Start handler.
+
+**Root cause:** `@module-federation/vite` injects entry chunks into all build environments unconditionally, not just the client environment. The same pattern as the manifest scanner issue but one layer deeper in the Nitro SSR entry detection.
+
+This is a new finding and has not yet been reported upstream.
 
 ## Related PRs
 
-- **`@module-federation/vite`** — [module-federation/vite#586](https://github.com/module-federation/vite/pull/586): Fixes CJS virtual modules being generated in SSR serve mode. This repo uses the canary build from that PR via `pkg.pr.new`.
-- **`@tanstack/start-plugin-core`** — [TanStack/router#7032](https://github.com/TanStack/router/issues/7032): The manifest scanner needs to skip plugin-injected entry chunks (e.g. `hostInit` from MF) to allow production builds to succeed.
+- **`@module-federation/vite`** — [module-federation/vite#586](https://github.com/module-federation/vite/pull/586): Fixes CJS virtual modules in SSR serve mode. This repo uses the canary build from that PR via `pkg.pr.new`.
+- **`@tanstack/start-plugin-core`** — [TanStack/router#7089](https://github.com/TanStack/router/pull/7089): Skip plugin-injected entry chunks in the manifest scanner.
 
 ## How it works
 
