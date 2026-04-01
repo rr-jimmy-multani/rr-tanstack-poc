@@ -1,0 +1,7 @@
+node_modules
+dist
+.output
+.vinxi
+.nitro
+.__mf__temp
+@mf-types
