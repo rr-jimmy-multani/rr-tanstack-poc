@@ -13,7 +13,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@module-federation/vite": "1.14.0",
+    "@module-federation/vite": "https://pkg.pr.new/@module-federation/vite@586",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.4.1",
