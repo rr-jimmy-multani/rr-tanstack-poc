@@ -19,6 +19,11 @@ const patches = [
     src: resolve(root, '../tanstack-router/packages/start-plugin-core/dist'),
     dest: resolve(root, 'node_modules/@tanstack/start-plugin-core/dist'),
   },
+  {
+    name: '@module-federation/vite',
+    src: resolve(root, '../mf-vite/lib'),
+    dest: resolve(root, 'node_modules/@module-federation/vite/lib'),
+  },
 ]
 
 for (const { name, src, dest } of patches) {
