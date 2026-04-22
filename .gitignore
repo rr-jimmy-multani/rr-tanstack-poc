@@ -5,6 +5,7 @@ dist
 .nitro
 .__mf__temp
 @mf-types
+.mf
 local-packages
 .yarn/install-state.gz
 .yarn/cache
