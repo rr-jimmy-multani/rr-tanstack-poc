@@ -7,6 +7,10 @@ export default defineConfig({
   plugins: [
     federation({
       name: 'host',
+      // TanStack Start renders HTML server-side via Nitro, so transformIndexHtml
+      // never fires. Use 'entry' injection to reliably initialise the MF runtime
+      // in the client bundle without relying on HTML transformation hooks.
+      hostInitInjectLocation: 'entry',
       remotes: {
         remote: {
           type: 'module',
