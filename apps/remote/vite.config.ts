@@ -13,9 +13,6 @@ export default defineConfig({
       shared: {
         react: { singleton: true, requiredVersion: '^19.0.0' },
         'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
-        // Share the MF runtime so the browser resolves it from the host's
-        // share scope rather than loading it as an unresolvable bare specifier.
-        '@module-federation/runtime': { singleton: true, requiredVersion: '*' },
       },
     }),
     react(),

@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react'
 import { federation } from '@module-federation/vite'
 import { nitro } from 'nitro/vite'
 export default defineConfig({
+  // Keep react/react-dom as node_modules externals in the Nitro SSR bundle
+  // so all server-side code (host renderer + MF-loaded remote components)
+  // shares the same require() module instance via Node's CJS cache.
+  nitro: {
+    traceDeps: ['react', 'react-dom'],
+  },
   plugins: [
     federation({
       name: 'host',
@@ -21,7 +27,6 @@ export default defineConfig({
       shared: {
         react: { singleton: true, requiredVersion: '^19.0.0' },
         'react-dom': { singleton: true, requiredVersion: '^19.0.0' },
-        '@module-federation/runtime': { singleton: true, requiredVersion: '*' },
       },
     }),
     tanstackStart(),
