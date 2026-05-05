@@ -1,13 +1,19 @@
 # TanStack Start + Module Federation — SSR POC
 
-A proof-of-concept monorepo demonstrating TanStack Start (SSR) working with `@module-federation/vite` on Vite 8.
+A proof-of-concept monorepo demonstrating full SSR with `@module-federation/vite` on Vite 8 (Rolldown). Remote components are server-rendered on the host — no `ClientOnly` wrapper required.
 
 ## Apps
 
 | App | Description | Port |
 |---|---|---|
-| `apps/host` | TanStack Start SSR host, consumes remote Widget via Module Federation | 3000 |
-| `apps/remote` | Plain Vite + React remote, exposes `Widget` component | 5001 |
+| `apps/host` | TanStack Start SSR host — consumes remote components via Module Federation | 3000 |
+| `apps/remote` | Vite + React remote — exposes `Widget` and `Counter` components | 5001 |
+
+## Packages
+
+| Package | Description |
+|---|---|
+| `packages/shared` | Shared `ThemeContext` — validates React singleton across the MF boundary |
 
 ## Prerequisites
 
@@ -21,67 +27,60 @@ nvm use
 yarn install
 ```
 
-### Run both apps
+## Development
 
 ```bash
-yarn dev
-```
-
-This starts both the remote (port 5001) and host (port 3000) in parallel.
-
-### Run individually
-
-```bash
+yarn dev          # starts both remote (5001) and host (3000) in parallel
 yarn dev:remote   # remote only
 yarn dev:host     # host only
 ```
 
-### Build
+## Production
+
+Build remote first, then host (topological order is handled automatically):
 
 ```bash
-yarn build        # builds remote first, then host (topological order)
-yarn build:remote
-yarn build:host
+yarn build
 ```
 
-### Sync local fork patches (after making changes in tanstack-router fork)
+Serve the remote with CORS headers:
 
 ```bash
-yarn sync-patches
+cd apps/remote && yarn vite preview   # serves on http://localhost:5001
 ```
 
-## Status
+Start the host production server:
+
+```bash
+node apps/host/.output/server/index.mjs   # serves on http://localhost:3000
+```
+
+## What this validates
 
 | Scenario | Status |
 |---|---|
-| Dev server (SSR) | ✅ Working |
-| Production build (client + SSR bundles) | ✅ Working |
-| Production server | ❌ Blocked — Nitro SSR entry detection conflict (see below) |
-
-## Known Issues
-
-### Layer 1: TanStack manifest scanner — fixed (PR open)
-
-`@tanstack/start-plugin-core`'s `scanClientChunks` throws when it encounters multiple `isEntry` chunks — `@module-federation/vite` injects `hostInit` and `remoteEntry` as entry chunks alongside the real app entry. Fix: skip entries whose `facadeModuleId` matches `__mf__virtual` or `virtual:mf-`.
-
-- **Issue:** [TanStack/router#7032](https://github.com/TanStack/router/issues/7032)
-- **PR:** [TanStack/router#7089](https://github.com/TanStack/router/pull/7089)
-
-### Layer 2: Nitro SSR entry detection — under investigation
-
-After fixing Layer 1, the production server (`node .output/server/index.mjs`) starts but crashes on the first request with `TypeError: mod.fetch is not a function`. Nitro detects the SSR entry by reading `environments.ssr.build.rollupOptions.input` — because `@module-federation/vite` injects `hostInit` into the SSR Rollup environment, Nitro picks it up as the SSR handler instead of the real TanStack Start handler.
-
-**Root cause:** `@module-federation/vite` injects entry chunks into all build environments unconditionally, not just the client environment. The same pattern as the manifest scanner issue but one layer deeper in the Nitro SSR entry detection.
-
-This is a new finding and has not yet been reported upstream.
-
-## Related PRs
-
-- **`@module-federation/vite`** — [module-federation/vite#586](https://github.com/module-federation/vite/pull/586): Fixes CJS virtual modules in SSR serve mode. This repo uses the canary build from that PR via `pkg.pr.new`.
-- **`@tanstack/start-plugin-core`** — [TanStack/router#7089](https://github.com/TanStack/router/pull/7089): Skip plugin-injected entry chunks in the manifest scanner.
+| Remote components server-rendered (no ClientOnly) | ✅ Working |
+| Shared context singleton across MF boundary | ✅ Working |
+| Multiple exposes (`Widget` + `Counter`) | ✅ Working |
+| `useRef` DOM interaction after hydration | ✅ Working |
+| Hydration badge: `ssr` → `hydrated` after JS loads | ✅ Working |
+| Client-side navigation (away and back) | ✅ Working |
+| Error boundary when remote is unreachable | ✅ Working |
+| Production build (client + SSR + Nitro bundles) | ✅ Working |
 
 ## How it works
 
-The host SSR-renders the page shell server-side. Remote modules cannot be fetched server-side (they live on a separate server), so they are wrapped in `<ClientOnly>` — the server renders the fallback, and the real component hydrates on the client once the MF runtime initialises.
+`@module-federation/vite` (PR [#692](https://github.com/module-federation/vite/pull/692)) adds two things:
 
-See the [Confluence doc](https://rakutenrewards.atlassian.net/wiki/spaces/~jimmy.multani/pages/44320325662) for full findings.
+1. **`pluginSSRRemoteEntry`** — emits `remoteEntry.server.js` (ESM) alongside the browser `remoteEntry.js` during the remote's build. MF internal packages are marked as Node externals only within the SSR module graph, so the browser bundle is unaffected.
+
+2. **`ssrEntryLoader`** — a MF runtime plugin auto-injected on the host. It intercepts the `loadEntry` lifecycle hook on the server, fetches the remote's `remoteEntry.server.js` via HTTP, rewrites relative imports and bare shared specifiers to `file://` paths, and writes temp `.mjs` files so Node can evaluate it natively.
+
+The host's `ThemeContext` is provided at the root and consumed by both remote components. It crosses the MF boundary because `@rr-framework/shared` is declared as a singleton in both apps' MF config — the same module instance is shared across the boundary at runtime.
+
+For Nitro-based hosts, `nitro: { traceDeps: ['react', 'react-dom'] }` is required in `vite.config.ts` to externalise React from Nitro's SSR bundle so all server-side code shares the same CJS React instance via Node's module cache.
+
+## Related
+
+- **`@module-federation/vite` PR:** [module-federation/vite#692](https://github.com/module-federation/vite/pull/692)
+- **TanStack manifest scanner fix:** [TanStack/router#7089](https://github.com/TanStack/router/pull/7089)
