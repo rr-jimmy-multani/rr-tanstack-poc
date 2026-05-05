@@ -25,4 +25,8 @@ export default defineConfig({
     cors: true,
     origin: 'http://localhost:5001',
   },
+  preview: {
+    port: 5001,
+    cors: true,
+  },
 })

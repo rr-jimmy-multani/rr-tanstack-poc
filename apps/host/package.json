@@ -9,7 +9,7 @@
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
-    "@module-federation/vite": "https://pkg.pr.new/@module-federation/vite@586",
+    "@module-federation/vite": "https://pkg.pr.new/@module-federation/vite@692",
     "@tanstack/react-router": "^1.168.10",
     "@tanstack/react-start": "^1.167.16",
     "react": "^19.0.0",
