@@ -2,7 +2,8 @@
   "name": "rr-framework-web",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "packageManager": "yarn@4.13.0",
   "scripts": {

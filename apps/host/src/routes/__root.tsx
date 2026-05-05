@@ -1,4 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { ThemeContext } from '@rr-framework/shared'
+
+const hostTheme = { primaryColour: '#e2001a', label: 'host' }
 
 export const Route = createRootRoute({
   head: () => ({
@@ -18,7 +21,9 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body>
-        <Outlet />
+        <ThemeContext.Provider value={hostTheme}>
+          <Outlet />
+        </ThemeContext.Provider>
         <Scripts />
       </body>
     </html>

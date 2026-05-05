@@ -1615,6 +1615,7 @@ __metadata:
   resolution: "@rr-framework/host@workspace:apps/host"
   dependencies:
     "@module-federation/vite": "https://pkg.pr.new/@module-federation/vite@692"
+    "@rr-framework/shared": "workspace:^"
     "@tanstack/react-router": "npm:^1.168.10"
     "@tanstack/react-start": "npm:^1.167.16"
     "@types/react": "npm:^19.0.0"
@@ -1634,6 +1635,7 @@ __metadata:
   resolution: "@rr-framework/remote@workspace:apps/remote"
   dependencies:
     "@module-federation/vite": "https://pkg.pr.new/@module-federation/vite@692"
+    "@rr-framework/shared": "workspace:^"
     "@types/react": "npm:^19.0.0"
     "@types/react-dom": "npm:^19.0.0"
     "@vitejs/plugin-react": "npm:^4.4.1"
@@ -1641,6 +1643,14 @@ __metadata:
     react-dom: "npm:^19.0.0"
     typescript: "npm:^5.8.3"
     vite: "npm:^8.0.3"
+  languageName: unknown
+  linkType: soft
+
+"@rr-framework/shared@workspace:^, @rr-framework/shared@workspace:packages/shared":
+  version: 0.0.0-use.local
+  resolution: "@rr-framework/shared@workspace:packages/shared"
+  peerDependencies:
+    react: ^19.0.0
   languageName: unknown
   linkType: soft
 
