@@ -1,9 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from '@rr-framework/shared'
 
 export default function Widget() {
   const [count, setCount] = useState(0)
+  const [hydrated, setHydrated] = useState(false)
   const theme = useTheme()
+
+  useEffect(() => {
+    setHydrated(true)
+  }, [])
 
   return (
     <div style={{ border: `2px solid ${theme.primaryColour}`, borderRadius: 8, padding: 24, maxWidth: 320 }}>
@@ -16,10 +21,24 @@ export default function Widget() {
       </p>
       <button
         onClick={() => setCount((c) => c + 1)}
-        style={{ padding: '8px 16px', cursor: 'pointer' }}
+        style={{ padding: '8px 16px', cursor: 'pointer', display: 'block', marginBottom: 8 }}
       >
         Count: {count}
       </button>
+      <span
+        style={{
+          display: 'inline-block',
+          padding: '2px 8px',
+          borderRadius: 4,
+          fontSize: 11,
+          fontWeight: 600,
+          background: hydrated ? '#e6f4ea' : '#f5f5f5',
+          color: hydrated ? '#1e7e34' : '#999',
+          border: `1px solid ${hydrated ? '#a8d5b5' : '#ddd'}`,
+        }}
+      >
+        {hydrated ? 'hydrated' : 'ssr'}
+      </span>
     </div>
   )
 }
