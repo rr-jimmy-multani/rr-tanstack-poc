@@ -11,8 +11,8 @@
   "dependencies": {
     "@module-federation/vite": "https://pkg.pr.new/@module-federation/vite@692",
     "@rr-framework/shared": "workspace:^",
-    "@tanstack/react-router": "^1.168.10",
-    "@tanstack/react-start": "^1.167.16",
+    "@tanstack/react-router": "1.169.2",
+    "@tanstack/react-start": "1.167.64",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "vinxi": "^0.5.3"
