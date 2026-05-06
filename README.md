@@ -83,4 +83,3 @@ For Nitro-based hosts, `nitro: { traceDeps: ['react', 'react-dom'] }` is require
 ## Related
 
 - **`@module-federation/vite` PR:** [module-federation/vite#692](https://github.com/module-federation/vite/pull/692)
-- **TanStack manifest scanner fix:** [TanStack/router#7089](https://github.com/TanStack/router/pull/7089)

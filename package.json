@@ -12,7 +12,6 @@
     "dev:host": "yarn workspace @rr-framework/host dev",
     "dev:remote": "yarn workspace @rr-framework/remote dev",
     "build:host": "yarn workspace @rr-framework/host build",
-    "build:remote": "yarn workspace @rr-framework/remote build",
-    "sync-patches": "node scripts/sync-patches.mjs"
+    "build:remote": "yarn workspace @rr-framework/remote build"
   }
 }
